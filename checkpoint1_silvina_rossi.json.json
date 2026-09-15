@@ -1,0 +1,234 @@
+{
+  "name": "checkpoint1_silvina_rossi.json",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analiza la siguiente solicitud de prueba: necesito revisar una situación comercial, determinar qué información es relevante y registrar la información necesaria. Utiliza las herramientas disponibles únicamente cuando sea necesario.",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "ROL CORPORATIVO\nEres un agente de operaciones y análisis comercial.\n\nOBJETIVOS\n- Analizar solicitudes comerciales y operativas.\n- Identificar información relevante.\n- Utilizar herramientas cuando sea necesario.\n- Registrar información cuando corresponda.\n- Entregar resultados claros, profesionales y verificables.\n\nRESTRICCIONES\n- No inventes información.\n- No ejecutes acciones innecesarias.\n- No utilices herramientas si la solicitud puede resolverse sin ellas.\n- Antes de utilizar una herramienta, determina si su utilización está justificada.\n- No elimines ni modifiques información sin una instrucción explícita.\n- Si una herramienta no permite completar una acción, informa el motivo.\n- Utiliza español corporativo estándar.\n- No utilices lenguaje inclusivo.\n\nUSO DE HERRAMIENTAS\nUtiliza la herramienta de productividad de forma autónoma cuando necesites consultar, verificar, registrar o actualizar información relacionada con la solicitud. La herramienta debe utilizarse solamente cuando aporte información o permita realizar una acción necesaria para cumplir el objetivo.\n\nOBSERVABILIDAD\nLa respuesta final debe permitir comprender qué se analizó, qué acción se realizó y cuál fue el resultado.\n\nREGLA FINAL\nResuelve la solicitud de forma autónoma dentro de las herramientas disponibles y respetando todas las restricciones anteriores.",
+          "maxIterations": 5
+        }
+      },
+      "id": "f01669cb-4f7e-4ece-8b7c-00d913718b76",
+      "name": "AI Agent - Tools Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        432
+      ],
+      "retryOnFail": false,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "080c8462-dfc9-4155-80f7-1ace6c2ff47d",
+      "name": "Gemini 2.5 Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        688
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "X0Tky1eJ5t3Rp5TI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1P35qj7D-bXIpbk67ZHJws3xZqPuPFyJ12Rgf84P_e3I/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $now }}",
+            "Mensaje": "={{ $json.chatInput }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje",
+              "displayName": "Mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "89054018-9233-4e2c-b2f1-0b7e93f2041f",
+      "name": "Google Sheets Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        576,
+        752
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9fzXlxmdY4cPkFIY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "silvirossi15@gmail.com",
+        "subject": "Reporte de ejecución - AI Agent",
+        "emailType": "text",
+        "message": "Reporte automático de observabilidad.\n\nResultado del AI Agent:\n{{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "9ab96a1e-b5f8-4f7e-ad4b-687f6a3c1c36",
+      "name": "Gmail - Reporte",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        432
+      ],
+      "webhookId": "c7802169-625e-4745-b81f-b74bcf96ae67",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "O3mENqEQkmOnq3jx",
+          "name": "Gmail account ok"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        432
+      ],
+      "id": "7ef22d83-162f-49f6-b07b-7009b40bafce",
+      "name": "When chat message received",
+      "webhookId": "a93ab30e-f7ea-4308-8d83-9710dfeda58f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        736
+      ],
+      "id": "6d4a0e5d-49ec-4f84-8f63-93ba29490935",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "X0Tky1eJ5t3Rp5TI",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gemini 2.5 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Tools Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent - Tools Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Tools Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Reporte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Tools Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Tools Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d4e80e05-2470-4d3b-b88d-6d5013728000",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f1f61ca6e34c797ad0d9bf4e1cd511751072efec25acc97befd8b6641dcc3ad0"
+  },
+  "id": "1xp8ky7t3pZJSvVV",
+  "tags": []
+}
